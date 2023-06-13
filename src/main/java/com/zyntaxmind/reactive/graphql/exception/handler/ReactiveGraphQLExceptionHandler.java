@@ -16,6 +16,7 @@
 
 package com.zyntaxmind.reactive.graphql.exception.handler;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.graphql.execution.DataFetcherExceptionResolver;
 import org.springframework.graphql.execution.ErrorType;
+import com.zyntaxmind.reactive.graphql.exception.Extension;
 import com.zyntaxmind.reactive.graphql.exception.GraphQLBaseException;
 import graphql.ErrorClassification;
 import graphql.GraphQLError;
@@ -67,7 +69,7 @@ public class ReactiveGraphQLExceptionHandler implements DataFetcherExceptionReso
             toGraphQLError(
                 environment, 
                 GRAPHQL_INTERNAL_EXCEPTION_MSG, 
-                Collections.singletonMap("executionId", environment.getExecutionId().toString()), 
+                new Extension(null, environment.getExecutionId(), Instant.now()).toMap(), 
                 ErrorType.INTERNAL_ERROR)));
   }
 
@@ -115,7 +117,7 @@ public class ReactiveGraphQLExceptionHandler implements DataFetcherExceptionReso
     log.debug(
         GRAPHQL_BASE_EXCEPTION_LOG, 
         exception.getMessage(),
-        ((GraphQLBaseException) exception).extension().code(),
+        ((GraphQLBaseException) exception).getCode(),
         ((GraphQLBaseException) exception).getErrorType(),
         environment.getExecutionStepInfo().getPath()
         );

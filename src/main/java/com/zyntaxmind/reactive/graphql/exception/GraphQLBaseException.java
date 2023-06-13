@@ -13,17 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  *******************************************************************************/
-/**
- * 
- */
+
 package com.zyntaxmind.reactive.graphql.exception;
 
-import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.ErrorClassification;
 import graphql.GraphQLError;
 import graphql.language.SourceLocation;
@@ -36,27 +30,23 @@ public class GraphQLBaseException extends RuntimeException implements GraphQLErr
 
   private static final long serialVersionUID = 8310307192390228711L;
 
-  private Extension extension;
+  private Extension extension = new Extension();
   
   private ErrorClassification errorType;
 
-  public GraphQLBaseException() {
-    
-  }
-  
   public GraphQLBaseException(ErrorClassification errorType) {
     this.errorType = errorType;
   }
 
   public GraphQLBaseException(String message, ErrorCode code, ErrorClassification errorType) {
     super(message);
-    this.extension = new Extension(code, Instant.now().toString());
+    this.extension.setCode(code);
     this.errorType = errorType;
   }
 
   public GraphQLBaseException(String message, ErrorCode code, ErrorClassification errorType, Throwable cause) {
     super(message, cause);
-    this.extension = new Extension(code, Instant.now().toString());
+    this.extension.setCode(code);
     this.errorType = errorType;
   }
 
@@ -81,13 +71,15 @@ public class GraphQLBaseException extends RuntimeException implements GraphQLErr
    */
   @Override
   public Map<String, Object> getExtensions() {    
-    return new HashMap<>(new ObjectMapper().convertValue(extension, new TypeReference<Map<String, Object>>() {}));
+    return extension.toMap();
   }
   
-  /**
-   * @return the extension
-   */
-  public Extension extension() {
-    return extension;
+  public GraphQLBaseException addExtensions(Map<String, Object> ext) {
+    extension.additionalExt.putAll(ext);
+    return this;
+  }
+  
+  public String getCode() {
+    return extension.getCode();
   }
 }

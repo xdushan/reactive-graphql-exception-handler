@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.zyntaxmind'
-version = '1.0.3'
+version = '1.1.0'
 sourceCompatibility = '17'
 
 repositories {
@@ -16,26 +16,33 @@ java {
 }
 
 dependencies {
-    implementation platform('org.springframework.boot:spring-boot-dependencies:3.0.5')
-	implementation 'org.springframework.boot:spring-boot-starter-graphql'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    api platform('org.springframework.boot:spring-boot-dependencies:3.0.5')
+	api 'org.springframework.boot:spring-boot-starter-graphql'
+	api 'org.springframework.boot:spring-boot-starter-webflux'
 }
+
+//publishing {
+//  repositories {
+//    maven {
+//      name = project.findProperty("azure.publisher.name")
+//      url = uri(project.findProperty("azure.publisher.maven.url"))
+//      credentials {
+//        username = project.findProperty("azure.publisher.username")
+//        password = project.findProperty("azure.publisher.token")
+//      }
+//    }
+//  }
+//  publications {
+//    gpr(MavenPublication) {
+//      from(components.java)
+//    }
+//  }
+//}
 
 publishing {
-  repositories {
-    maven {
-      name = project.findProperty("azure.publisher.name")
-      url = uri(project.findProperty("azure.publisher.maven.url"))
-      credentials {
-        username = project.findProperty("azure.publisher.username")
-        password = project.findProperty("azure.publisher.token")
-      }
-    }
-  }
   publications {
-    gpr(MavenPublication) {
-      from(components.java)
-    }
-  }
+      myLib(MavenPublication) {
+           from components.java
+      }
+ }
 }
-
