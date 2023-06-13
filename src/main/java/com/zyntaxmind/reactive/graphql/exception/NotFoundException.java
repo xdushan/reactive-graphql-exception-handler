@@ -37,7 +37,7 @@ public class NotFoundException extends GraphQLBaseException {
   }
 
   public NotFoundException(String message, ErrorCode code, Throwable cause) {
-    super(message, code, cause, ErrorType.NOT_FOUND);
+    super(message, code, ErrorType.NOT_FOUND, cause);
   }
 
 }

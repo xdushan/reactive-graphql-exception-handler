@@ -13,14 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  *******************************************************************************/
-/**
- * 
- */
+
 package com.zyntaxmind.reactive.graphql.exception.handler;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.graphql.execution.DataFetcherExceptionResolver;
 import org.springframework.graphql.execution.ErrorType;
 import com.zyntaxmind.reactive.graphql.exception.GraphQLBaseException;
@@ -36,25 +36,43 @@ import reactor.core.publisher.Mono;
  */
 public class ReactiveGraphQLExceptionHandler implements DataFetcherExceptionResolver {
 
+  
+  private static final Logger log = LoggerFactory.getLogger(ReactiveGraphQLExceptionHandler.class);
+  
+  private static final String GRAPHQL_BASE_EXCEPTION_LOG = "Exception: message='{}', errorCode='{}', classification='{}', path='{}'";
+  
+  private static final String GRAPHQL_INTERNAL_EXCEPTION_LOG = "Error: executionId='{}', message='{}', classification='{}', path='{}'";
+  
+  private static final String GRAPHQL_INTERNAL_EXCEPTION_MSG = "The server encountered an internal error or misconfiguration and was unable to complete the request.";
+  
   /***
    * {@inheritDoc}
    */
   @Override
   public Mono<List<GraphQLError>> resolveException(Throwable exception, DataFetchingEnvironment environment) {
-    final boolean isBaseException = exception instanceof GraphQLBaseException;
+    if(exception instanceof GraphQLBaseException) {
+      logResolvedError(exception, environment);
+      return Mono.just(
+          Collections.singletonList(
+              toGraphQLError(
+                  environment, 
+                  exception.getMessage(), 
+                  ((GraphQLBaseException) exception).getExtensions(), 
+                  ((GraphQLBaseException) exception).getErrorType())));
+    }
     
+    logUnresolvedError(exception, environment);
     return Mono.just(
         Collections.singletonList(
             toGraphQLError(
-                environment,
-                exception.getMessage(), 
-                isBaseException ? ((GraphQLBaseException) exception).getExtensions() : Collections.emptyMap(),
-                isBaseException ? ((GraphQLBaseException) exception).getErrorType() : ErrorType.INTERNAL_ERROR
-          )));
+                environment, 
+                GRAPHQL_INTERNAL_EXCEPTION_MSG, 
+                Collections.singletonMap("executionId", environment.getExecutionId().toString()), 
+                ErrorType.INTERNAL_ERROR)));
   }
 
   /***
-   * This method is used to build {@link GraphQLError} with below parameters.
+   * This method is used to build {@link GraphQLError} object with below parameters.
    * 
    * @param environment
    * @param message
@@ -69,5 +87,37 @@ public class ReactiveGraphQLExceptionHandler implements DataFetcherExceptionReso
       .extensions(extenstions)
       .errorType(errorType)
       .build();
+  }
+
+  /**
+   * log exceptions that resolved to {@link GraphQLBaseException}.
+   * 
+   * @param exception
+   * @param environment
+   */
+  private void logUnresolvedError(Throwable exception, DataFetchingEnvironment environment) {
+    log.error(
+        GRAPHQL_INTERNAL_EXCEPTION_LOG, 
+        environment.getExecutionId(),
+        exception.getLocalizedMessage(),
+        ErrorType.INTERNAL_ERROR,
+        environment.getExecutionStepInfo().getPath()
+        );
+  }
+
+  /**
+   * log unresolved exceptions.
+   * 
+   * @param exception
+   * @param environment
+   */
+  private void logResolvedError(Throwable exception, DataFetchingEnvironment environment) {
+    log.debug(
+        GRAPHQL_BASE_EXCEPTION_LOG, 
+        exception.getMessage(),
+        ((GraphQLBaseException) exception).extension().code(),
+        ((GraphQLBaseException) exception).getErrorType(),
+        environment.getExecutionStepInfo().getPath()
+        );
   }
 }

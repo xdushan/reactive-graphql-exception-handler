@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.zyntaxmind'
-version = '1.0.1'
+version = '1.0.2'
 sourceCompatibility = '17'
 
 repositories {
@@ -16,9 +16,9 @@ java {
 }
 
 dependencies {
-    implementation platform('org.springframework.boot:spring-boot-dependencies:3.0.5')
-	implementation 'org.springframework.boot:spring-boot-starter-graphql'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    api platform('org.springframework.boot:spring-boot-dependencies:3.0.5')
+	api 'org.springframework.boot:spring-boot-starter-graphql'
+	api 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 publishing {
@@ -39,3 +39,4 @@ publishing {
   }
 }
 
+}

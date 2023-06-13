@@ -37,7 +37,7 @@ public class InternalException extends GraphQLBaseException {
   }
 
   public InternalException(String message, ErrorCode code, Throwable cause) {
-    super(message, code, cause, ErrorType.INTERNAL_ERROR);
+    super(message, code, ErrorType.INTERNAL_ERROR, cause);
   }
 
 }

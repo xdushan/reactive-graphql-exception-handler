@@ -13,31 +13,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  *******************************************************************************/
-/**
- * 
- */
 package com.zyntaxmind.reactive.graphql.exception;
-
-import org.springframework.graphql.execution.ErrorType;
 
 /**
  * @author dush
+ * @date Jun 13, 2023
  *
  */
-public class UnAuthorizedException extends GraphQLBaseException {
-
-  private static final long serialVersionUID = 1807208242818393176L;
-
-  public UnAuthorizedException() {
-    super(ErrorType.UNAUTHORIZED);
-  }
+public record Extension(
+    ErrorCode code,
+    String timestamp
+    ) {
   
-  public UnAuthorizedException(String message, ErrorCode code) {
-    super(message, code, ErrorType.UNAUTHORIZED);
-  }
-
-  public UnAuthorizedException(String message, ErrorCode code, Throwable cause) {
-    super(message, code, ErrorType.UNAUTHORIZED, cause);
-  }
-
 }

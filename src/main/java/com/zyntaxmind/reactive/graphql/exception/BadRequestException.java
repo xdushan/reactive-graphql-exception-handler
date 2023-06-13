@@ -37,7 +37,7 @@ public class BadRequestException extends GraphQLBaseException {
   }
 
   public BadRequestException(String message, ErrorCode code, Throwable cause) {
-    super(message, code, cause, ErrorType.BAD_REQUEST);
+    super(message, code, ErrorType.BAD_REQUEST, cause);
   }
 
 }

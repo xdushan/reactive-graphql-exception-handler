@@ -37,7 +37,7 @@ public class ForbiddenException extends GraphQLBaseException {
   }
 
   public ForbiddenException(String message, ErrorCode code, Throwable cause) {
-    super(message, code, cause, ErrorType.FORBIDDEN);
+    super(message, code, ErrorType.FORBIDDEN, cause);
   }
 
 }

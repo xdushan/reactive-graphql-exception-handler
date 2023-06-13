@@ -22,6 +22,8 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.ErrorClassification;
 import graphql.GraphQLError;
 import graphql.language.SourceLocation;
@@ -30,11 +32,11 @@ import graphql.language.SourceLocation;
  * @author dush
  *
  */
-public class GraphQLBaseException  extends RuntimeException implements GraphQLError {
+public class GraphQLBaseException extends RuntimeException implements GraphQLError {
 
   private static final long serialVersionUID = 8310307192390228711L;
 
-  private Map<String, Object> extensions;
+  private Extension extension;
   
   private ErrorClassification errorType;
 
@@ -48,13 +50,13 @@ public class GraphQLBaseException  extends RuntimeException implements GraphQLEr
 
   public GraphQLBaseException(String message, ErrorCode code, ErrorClassification errorType) {
     super(message);
-    this.toExtensions(code);
+    this.extension = new Extension(code, Instant.now().toString());
     this.errorType = errorType;
   }
 
-  public GraphQLBaseException(String message, ErrorCode code, Throwable cause, ErrorClassification errorType) {
+  public GraphQLBaseException(String message, ErrorCode code, ErrorClassification errorType, Throwable cause) {
     super(message, cause);
-    this.toExtensions(code);
+    this.extension = new Extension(code, Instant.now().toString());
     this.errorType = errorType;
   }
 
@@ -75,23 +77,17 @@ public class GraphQLBaseException  extends RuntimeException implements GraphQLEr
   }
   
   /**
-   * @return the extensions
+   * {@inheritDoc}
    */
-  public Map<String, Object> getExtensions() {
-    return extensions;
-  }
-
-  /***
-   * add 'code' and 'timestamp' to extentions response.
-   * 
-   * @param code
-   * @return the extensions
-   */
-  private Map<String, Object> toExtensions(ErrorCode code){
-    extensions  = new HashMap<>();
-    extensions.put("code", code);
-    extensions.put("timestamp", Instant.now());
-    return extensions;
+  @Override
+  public Map<String, Object> getExtensions() {    
+    return new HashMap<>(new ObjectMapper().convertValue(extension, new TypeReference<Map<String, Object>>() {}));
   }
   
+  /**
+   * @return the extension
+   */
+  public Extension extension() {
+    return extension;
+  }
 }
